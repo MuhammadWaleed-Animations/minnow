@@ -3,14 +3,14 @@
 #include <cstdint>
 #include <string>
 #include <string_view>
-
+#include <queue>
 class Reader;
 class Writer;
 
 class ByteStream
 {
 public:
-  explicit ByteStream( uint64_t capacity );
+  explicit ByteStream( uint64_t capacity);
 
   // Helper functions (provided) to access the ByteStream's Reader and Writer interfaces
   Reader& reader();
@@ -23,8 +23,15 @@ public:
 
 protected:
   // Please add any additional state to the ByteStream here, and not to the Writer and Reader interfaces.
-  uint64_t capacity_;
+  uint64_t capacity_{};
+  uint64_t a_capacity_{};
+  uint64_t b_pushed{};
+  uint64_t b_popped{};
+  mutable std::string buffer{};
+  std::queue<char> qbuffer{};
+  std::vector<char> sudoQ{};
   bool error_ {};
+  bool close_ {false};
 };
 
 class Writer : public ByteStream
