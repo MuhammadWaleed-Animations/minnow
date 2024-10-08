@@ -1,12 +1,47 @@
+// #pragma once
+
+// #include "byte_stream.hh"
+// #include <map>
+// #include <string>
+
+// class Reassembler
+// {
+// public:
+//     explicit Reassembler(ByteStream &&output)
+//         : output_(std::move(output)),
+//           next_idx_(0),
+//           bytes_pending_(0),
+//           last_idx_(0),
+//           last_substring_received_(false),
+//           unassembled_() {}
+
+//     void insert(uint64_t first_idx, std::string data, bool is_last_substring);
+//     uint64_t bytes_pending() const;
+
+//     Reader &reader() { return output_.reader(); }
+//     const Reader &reader() const { return output_.reader(); }
+//     const Writer &writer() const { return output_.writer(); }
+
+// private:
+//     ByteStream output_;
+//     uint64_t next_idx_;
+//     uint64_t bytes_pending_;
+//     uint64_t last_idx_;
+//     bool last_substring_received_;
+//     std::map<uint64_t, char> unassembled_;
+// };
+
 #pragma once
 
 #include "byte_stream.hh"
-
+#include <unordered_map>
+#include <string>
+using namespace std;
 class Reassembler
 {
 public:
   // Construct Reassembler to write into given ByteStream.
-  explicit Reassembler( ByteStream&& output ) : output_( std::move( output ) ) {}
+  explicit Reassembler( ByteStream&& output ) : output_( std::move( output ) ),bytes_buffered(0),next_index(0),lastIndex(0),closed(0),capacity_(output_.writer().available_capacity()),last_index(0),vbuffer(output_.writer().available_capacity()),pick(0),put(0) {}
 
   /*
    * Insert a new substring to be reassembled into a ByteStream.
@@ -42,4 +77,15 @@ public:
 
 private:
   ByteStream output_; // the Reassembler writes to this ByteStream
+  unordered_map<int,string> buffer_{};
+  uint64_t bytes_buffered{};
+  uint64_t next_index{};
+  bool lastIndex{};
+  bool closed{};
+  uint64_t capacity_{};
+  uint64_t last_index{};
+  //////////////////////////
+  std::vector<char> vbuffer;
+  uint64_t pick{};
+  uint64_t put{};
 };
