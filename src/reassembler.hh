@@ -36,12 +36,13 @@
 #include "byte_stream.hh"
 #include <unordered_map>
 #include <string>
+#include <utility>
 using namespace std;
 class Reassembler
 {
 public:
   // Construct Reassembler to write into given ByteStream.
-  explicit Reassembler( ByteStream&& output ) : output_( std::move( output ) ),bytes_buffered(0),next_index(0),lastIndex(0),closed(0),capacity_(output_.writer().available_capacity()),last_index(0),vbuffer(output_.writer().available_capacity()),pick(0),put(0) {}
+  explicit Reassembler( ByteStream&& output ) : output_( std::move( output ) ),bytes_buffered(0),next_index(0),lastIndex(0),closed(0),capacity_(output_.writer().available_capacity()),last_index(0),vbuffer(output_.writer().available_capacity(), std::make_pair(-1, 'W')),pick(0),put(0) {}
 
   /*
    * Insert a new substring to be reassembled into a ByteStream.
@@ -85,7 +86,7 @@ private:
   uint64_t capacity_{};
   uint64_t last_index{};
   //////////////////////////
-  std::vector<char> vbuffer;
+  std::vector<pair<uint64_t,char>> vbuffer;
   uint64_t pick{};
   uint64_t put{};
 };
