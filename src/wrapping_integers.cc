@@ -15,19 +15,28 @@ uint64_t Wrap32::unwrap( Wrap32 zero_point, uint64_t checkpoint ) const
     if (zero_point.raw_value_ <= raw_value_)   sudo_abs = raw_value_ - zero_point.raw_value_;
     else    sudo_abs = (uint32 -zero_point.raw_value_) + raw_value_ ;
 
-    uint64_t quotient = checkpoint / uint32;
+    //uint64_t quotient = checkpoint / uint32;
+    uint64_t quotient = checkpoint >> 32;
 
-    uint64_t op1 = sudo_abs + ((quotient-1) * uint32);
-    uint64_t op2 = sudo_abs + ((quotient) * uint32);
-    uint64_t op3 = sudo_abs + ((quotient+1) * uint32);
+
+    // uint64_t op1 = sudo_abs + ((quotient-1) * uint32);
+    // uint64_t op2 = sudo_abs + ((quotient) * uint32);
+    // uint64_t op3 = sudo_abs + ((quotient+1) * uint32);
+    uint64_t op1 = sudo_abs + ((quotient-1) <<32);
+    uint64_t op2 = sudo_abs + ((quotient) <<32);
+    uint64_t op3 = sudo_abs + ((quotient+1) <<32);
 
     long long diff1 = op1- checkpoint;
     long long diff2 = op2- checkpoint;
     long long diff3 = op3- checkpoint;
 
-    if (diff1 < 0 ) diff1 = -1 * diff1; 
-    if (diff2 < 0 ) diff2 = -1 * diff2;
-    if (diff3 < 0 ) diff3 = -1 * diff3; 
+    // if (diff1 < 0 ) diff1 = -1 * diff1; 
+    // if (diff2 < 0 ) diff2 = -1 * diff2;
+    // if (diff3 < 0 ) diff3 = -1 * diff3; 
+    if (diff1 < 0 ) diff1 = (diff1 ^ (diff1>>63))-(diff1>>63); 
+    if (diff2 < 0 ) diff2 = (diff2 ^ (diff2>>63))-(diff2>>63);  
+    if (diff3 < 0 ) diff3 = (diff3 ^ (diff3>>63))-(diff3>>63); 
+
 
     //cout<<"Sudo Absolute value: "<<sudo_abs <<"\nQuotient: "<<quotient<<"\nCheckPoint: "<<checkpoint<<endl;
     // std::cout <<"op1 " << op1 << std::endl;
